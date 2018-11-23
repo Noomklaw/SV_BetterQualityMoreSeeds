@@ -1,10 +1,10 @@
 ﻿{
-  "Name": "smcq - Seed Maker Crop Quality",
+  "Name": "smcq",
   "Author": "mcoocr",
-  "Version": "1.0.0",
-  "Description": "Output seed-count depends on input crop quality.\nForked from \"Better Quality More Seeds\"",
+  "Version": "1.1",
+  "Description": "smcq - Seed Maker Crop Quality, output seed-count depends on input crop quality, forked from \"Better Quality More Seeds\"",
   "UniqueID": "mcoocr.smcq",
   "EntryDll": "smcq.dll",
   "MinimumApiVersion": "2.0",
-  "UpdateKeys": []
+  "UpdateKeys": [ "Nexus:3089" ]
 }
