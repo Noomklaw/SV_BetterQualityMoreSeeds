@@ -1,13 +1,10 @@
-{
-  "Author": "Brandon Marquis Markail Green (Space Baby)",
-  "Description": "Gain More Seeds For Adding Better Quality Crops",
-  "EntryDll": "SB_BQMS.dll",
-  "Name": "Better Quality, More Seeds",
-  "UniqueID": "SB_BQMS",
-  "Version": {
-    "MajorVersion": 1,
-    "MinorVersion": 0,
-    "PatchVersion": 1,
-    "Build": null
-  }
+﻿{
+  "Name": "smcq - Seed Maker Crop Quality",
+  "Author": "mcoocr",
+  "Version": "1.0.0",
+  "Description": "Output seed-count depends on input crop quality.\nForked from \"Better Quality More Seeds\"",
+  "UniqueID": "mcoocr.smcq",
+  "EntryDll": "smcq.dll",
+  "MinimumApiVersion": "2.0",
+  "UpdateKeys": []
 }
