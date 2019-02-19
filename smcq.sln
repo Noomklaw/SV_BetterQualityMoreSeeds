@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.271
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "smcq", "smcq.csproj", "{AD83B4C2-B654-4341-8E13-F146E281E764}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AD83B4C2-B654-4341-8E13-F146E281E764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD83B4C2-B654-4341-8E13-F146E281E764}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD83B4C2-B654-4341-8E13-F146E281E764}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD83B4C2-B654-4341-8E13-F146E281E764}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CFFD08E4-7B70-4576-8C42-AC550F96906D}
+	EndGlobalSection
+EndGlobal

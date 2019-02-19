@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using StardewModdingAPI;
-using StardewModdingAPI.Events;
 using StardewValley;
 using System;
 using System.Collections.Generic;
@@ -21,62 +20,62 @@ namespace smcq
 {
   public class ManagedSeedMaker
   {
-    public StardewValley.Object refSeedMaker;
-    public StardewValley.Object refDroppedObject;
-    public bool hasBeenChecked;
-    public bool isDeprecated;
+    public StardewValley.Object RefSeedMaker;
+    public StardewValley.Object RefDroppedObject;
+    public bool HasBeenChecked;
+    public bool IsDeprecated;
 
     public ManagedSeedMaker(StardewValley.Object seedMaker, StardewValley.Object droppedObject, bool isChecked)
     {
-      refSeedMaker = seedMaker;
-      refDroppedObject = droppedObject;
-      hasBeenChecked = isChecked;
-      isDeprecated = false;
+      RefSeedMaker = seedMaker;
+      RefDroppedObject = droppedObject;
+      HasBeenChecked = isChecked;
+      IsDeprecated = false;
     }
   }
 
-  public class Smcq : StardewModdingAPI.Mod
+  public class Smcq : Mod
   {
-    List<ManagedSeedMaker> arSeedMakers;
+    List<ManagedSeedMaker> _arSeedMakers;
 
-    StardewValley.Object previousHeldItem = null;
-    GameLocation previousLocation = null;
-    bool isInitialized = false;
+    StardewValley.Object _previousHeldItem;
+    GameLocation _previousLocation;
+    bool _isInitialized;
 
     public override void Entry(IModHelper helper)
     {
-      SaveEvents.AfterLoad += InitializeMod;
-      SaveEvents.AfterReturnToTitle += ResetMod;
-      GameEvents.UpdateTick += ModUpdate;
+        helper.Events.GameLoop.SaveLoaded += InitializeMod;
+        helper.Events.GameLoop.ReturnedToTitle += ResetMod;
+        helper.Events.GameLoop.UpdateTicked += ModUpdate;
 
-      arSeedMakers = new List<ManagedSeedMaker>();
-      arSeedMakers.Clear();
+      _arSeedMakers = new List<ManagedSeedMaker>();
+      _arSeedMakers.Clear();
 
-      isInitialized = false;
+      _isInitialized = false;
     }
 
     private void InitializeMod(object sender, EventArgs e)
     {
-      previousLocation = Game1.player.currentLocation;
-      isInitialized = true;
+      _previousLocation = Game1.player.currentLocation;
+      _isInitialized = true;
     }
 
     private void ResetMod(object sender, EventArgs e)
     {
-      isInitialized = false;
+      _isInitialized = false;
     }
 
     private void ModUpdate(object sender, EventArgs e)
     {
-      if (!isInitialized)
+      if (!_isInitialized)
         return;
 
-      if ((Game1.player.currentLocation == null) || (Game1.player.currentLocation.name == null))
+      if ((Game1.player.currentLocation == null) || (Game1.player.currentLocation.Name == null))
         return;
 
-      if ((previousLocation.name != Game1.player.currentLocation.name)) // get Seed Makers in current location, save them to array
+      if ((_previousLocation.Name != Game1.player.currentLocation.Name)) // get Seed Makers in current location, save them to array
       {
-        arSeedMakers.Clear();
+        _arSeedMakers.Clear();
 
         foreach (Vector2 x in Game1.player.currentLocation.objects.Keys)
         {
@@ -89,15 +88,15 @@ namespace smcq
           {
             //this.Monitor.Log($"existing (managed: {gl.objects[x].heldObject != null})");
 
-            arSeedMakers.Add(new ManagedSeedMaker(gl.objects[x], null, gl.objects[x].heldObject != null ? true : false));
+            _arSeedMakers.Add(new ManagedSeedMaker(gl.objects[x], null, gl.objects[x].heldObject.Value != null));
           }
         }
       }
       else // load new placed Seed Makers  in current location into array
       {
-        foreach (ManagedSeedMaker sm in arSeedMakers)
+        foreach (ManagedSeedMaker sm in _arSeedMakers)
         {
-          sm.isDeprecated = true;
+          sm.IsDeprecated = true;
         }
 
         foreach (Vector2 x in Game1.player.currentLocation.objects.Keys)
@@ -109,73 +108,71 @@ namespace smcq
 
           if (gl.objects[x].name.Equals("Seed Maker"))
           {
-            if (!arSeedMakers.Any(z => z.refSeedMaker == gl.objects[x])) // found new, yet unmanaged Seed Maker
+            if (_arSeedMakers.All(z => z.RefSeedMaker != gl.objects[x])) // found new, yet unmanaged Seed Maker
             {
               //this.Monitor.Log($"new (managed: {gl.objects[x].heldObject != null})");
 
-              arSeedMakers.Add(new ManagedSeedMaker(gl.objects[x], null, gl.objects[x].heldObject != null ? true : false));
+              _arSeedMakers.Add(new ManagedSeedMaker(gl.objects[x], null, gl.objects[x].heldObject.Value != null));
             }
             else
             {
-              arSeedMakers.First(z => z.refSeedMaker == gl.objects[x]).isDeprecated = false;
+              _arSeedMakers.First(z => z.RefSeedMaker == gl.objects[x]).IsDeprecated = false;
             }
           }
         }
 
         // clear non-existent managed Seed Makers
-        for(int x = 0; x < arSeedMakers.Count; x++)
+        for(int x = 0; x < _arSeedMakers.Count; x++)
         {
-          if(arSeedMakers[x].isDeprecated)
+          if(_arSeedMakers[x].IsDeprecated)
           {
             //this.Monitor.Log($"drop");
-            arSeedMakers.RemoveAt(x--);
+            _arSeedMakers.RemoveAt(x--);
           }
         }
       }
 
-      previousLocation = Game1.player.currentLocation;
+      _previousLocation = Game1.player.currentLocation;
 
       // check if an managed Seed Maker got crops inserted, if so add additional seeds based on crop quality
-      foreach (ManagedSeedMaker msm in arSeedMakers)
+      foreach (ManagedSeedMaker msm in _arSeedMakers)
       {
-        StardewValley.Object sm = msm.refSeedMaker;
+        StardewValley.Object sm = msm.RefSeedMaker;
 
-        if (msm.refSeedMaker == null)
+        if (msm.RefSeedMaker == null)
           continue;
 
         // new crop placed in managed Seed Maker
-        if (sm.heldObject.Value != null && msm.hasBeenChecked == false && msm.refDroppedObject == null)
+        if (sm.heldObject.Value != null && msm.HasBeenChecked == false && msm.RefDroppedObject == null)
         {
-          int x = 0;
+            //this.Monitor.Log($"trigger");
 
-          //this.Monitor.Log($"trigger");
-
-          msm.refDroppedObject = previousHeldItem;
-          msm.hasBeenChecked = true;
+          msm.RefDroppedObject = _previousHeldItem;
+          msm.HasBeenChecked = true;
 
           //this.Monitor.Log($"quality: {msm.refDroppedObject.quality}");
 
-          x = ((msm.refDroppedObject.quality == 4) ? (msm.refDroppedObject.quality - 1) : (msm.refDroppedObject.quality));
+          var x = ((msm.RefDroppedObject.Quality == 4) ? (msm.RefDroppedObject.Quality - 1) : (msm.RefDroppedObject.Quality));
 
           //this.Monitor.Log($"stack: {sm.heldObject.Get().stack.Value}");
           //this.Monitor.Log($"add: {x}");
 
-          sm.heldObject.Get().stack.Value = (sm.heldObject.Get().stack.Value + x);
+          sm.heldObject.Get().Stack = (sm.heldObject.Get().Stack + x);
 
           //this.Monitor.Log($"now: {sm.heldObject.Get().stack.Value}");
         }
 
         // seeds grabbed from Seed Maker, reset for new crops
-        if (sm.heldObject.Value == null && msm.hasBeenChecked == true)
+        if (sm.heldObject.Value == null && msm.HasBeenChecked)
         {
           //this.Monitor.Log($"drop");
 
-          msm.refDroppedObject = null;
-          msm.hasBeenChecked = false;
+          msm.RefDroppedObject = null;
+          msm.HasBeenChecked = false;
         }
       }
 
-      previousHeldItem = Game1.player.ActiveObject;
+      _previousHeldItem = Game1.player.ActiveObject;
     }
   }
 }
